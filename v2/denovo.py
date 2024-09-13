@@ -12,7 +12,7 @@ from Biatnovo.test_true_feeding import test_logit_batch_2_score
 from model import InferenceModelWrapper, device
 from v2 import deepnovo_config
 from v2.data_reader import BatchDenovoData, DIAFeature, DenovoData, TrainData, collate_func
-from DataProcess.deepnovo_cython_modules import get_candidate_intensity
+from DataProcess.deepnovo_cython_modules import get_candidate_intensity_dda
 from v2.writer import BeamSearchedSequence, DenovoWriter
 logger = logging.getLogger(__name__)
 
@@ -258,7 +258,7 @@ class DeepNovoAttionDenovo():
                             )
                         continue
 
-                    candidate_intensity = get_candidate_intensity(spectrum_original,
+                    candidate_intensity = get_candidate_intensity_dda(spectrum_original,
                                                                   precursor_mass,
                                                                   aa_seq_mass,
                                                                   direction_cint_map[direction])
@@ -640,7 +640,7 @@ class DeepNovoAttionDenovo():
 
         for i, id in enumerate(peptide_ids_forward[:-1]):
             prefix_mass += deepnovo_config.mass_ID[id]
-            candidate_intensity = get_candidate_intensity(spectrum_original_forward,
+            candidate_intensity = get_candidate_intensity_dda(spectrum_original_forward,
                                                           denovo_data.dia_feature.precursor_mass, prefix_mass, 0)
             candidate_intensity_forward.append(candidate_intensity)
 
@@ -648,7 +648,7 @@ class DeepNovoAttionDenovo():
         candidate_intensity_backward=[]
         for i, id in enumerate(peptide_ids_backward[:-1]):
             suffix_mass += deepnovo_config.mass_ID[id]
-            candidate_intensity = get_candidate_intensity(spectrum_original_backward,
+            candidate_intensity = get_candidate_intensity_dda(spectrum_original_backward,
                                                           denovo_data.dia_feature.precursor_mass, suffix_mass, 1)
             candidate_intensity_backward.append(candidate_intensity)
         return TrainData(denovo_data.spectrum_holder,
@@ -770,7 +770,7 @@ class DeepNovoAttionDenovo():
                                                      score=path.score_sum / len(seq))
                             )
 
-                    candidate_intensity = get_candidate_intensity(spectrum_original,
+                    candidate_intensity = get_candidate_intensity_dda(spectrum_original,
                                                                   precursor_mass,
                                                                   aa_seq_mass,
                                                                   direction_cint_map[Direction.forward])
@@ -834,7 +834,7 @@ class DeepNovoAttionDenovo():
                                                      position_score=trunc_score_list,
                                                      score=path.score_sum / len(seq))
                             )
-                    candidate_intensity = get_candidate_intensity(spectrum_original,
+                    candidate_intensity = get_candidate_intensity_dda(spectrum_original,
                                                                   precursor_mass,
                                                                   aa_seq_mass,
                                                                   direction_cint_map[Direction.backward])

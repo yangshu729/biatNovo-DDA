@@ -291,7 +291,7 @@ lr_mul = 0.5  # 0.5
 d_model = 256  # 256
 d_inner = 256
 n_warmup_steps = 500
-num_epoch = 5
+num_epoch = 15
 steps_per_validation = 100
 early_stop = 49 + 10
 

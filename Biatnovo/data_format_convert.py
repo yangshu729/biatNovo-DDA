@@ -43,7 +43,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                         scan = segments[-2]
                         run_id = segments[0]
                 elif line.startswith("PEPMASS="):
-                    mz = re.split("=|\r|\n", line)[1]
+                    mz = re.split("=|\r|\n", line)[1].split()[0]
                 elif line.startswith("CHARGE="):
                     z = re.split("=|\r|\n|\+", line)[1]
                 elif line.startswith("SCANS="):

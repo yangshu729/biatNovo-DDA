@@ -28,6 +28,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
             write_header = False
             for line in fr:
                 seq = ""
+                run_id = ""
                 if "BEGIN IONS" in line:
                     flag = True
                     spectrum_fw.write(line)
@@ -39,6 +40,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                     # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
                     if len(segments) >= 4:
                         scan = segments[-2]
+                        run_id = segments[0]
                 elif line.startswith("PEPMASS="):
                     mz = re.split("=|\r|\n", line)[1]
                 elif line.startswith("CHARGE="):
@@ -65,7 +67,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                 else:
                     if not write_header:
                         # Write updated fields in the correct order
-                        new_title = f"TITLE={base_path}_SCANS_{scan}\n"
+                        new_title = f"TITLE={base_path}_SCANS_{scan}\n" if base_path else f"TITLE={run_id}_SCANS_{scan}\n"
                         new_pepmass = f"PEPMASS={mz}\n"
                         new_charge = f"CHARGE={z}\n"
                         new_scans = f"SCANS={scan}\n"

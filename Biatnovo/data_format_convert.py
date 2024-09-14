@@ -67,23 +67,13 @@ if __name__ == "__main__":
     # FLAGS (options) for train
     # ==============================================================================
     parser.add_argument("--data_convert", action="store_true", default=False, help="Set to True for converting data.")
-    parser.add_argument("--species", type=str, default="", help="Species data")
-    parser.add_argument("--folder_name", type=str, default="", help="Folder to convert new format.")
+    parser.add_argument("--denovo_file", type=str, default="", help=".mgf file")
+    parser.add_argument("--folder_name", type=str, default="", help="output folder name")
     opt = parser.parse_args()
-    species_name = opt.species
-    folder_name = opt.folder_name + "cross.9high_80k.exclude_{}/".format(species_name)
-    # train_mgf_file = folder_name + 'cross.cat.mgf.train.repeat'
-    # valid_mgf_file = folder_name + 'cross.cat.mgf.valid.repeat'
-    # test_mgf_file = folder_name + 'cross.cat.mgf.test.repeat'
-    denovo_mgf_file = folder_name + "peaks.db.mgf"
-    # output_mgf_file = folder_name + 'spectrum.mgf'
-    # output_train_feature_file = folder_name + 'features.train.csv'
-    # output_valid_feature_file = folder_name + 'features.valid.csv'
-    # output_test_feature_file = folder_name + 'features.test.csv'
-    denovo_output_feature_file = folder_name + "test_features_10k.csv"
-    denovo_spectrum_fw = open(folder_name + "test_spectrum_10k.mgf", "w")
-    # transfer_mgf(train_mgf_file, output_train_feature_file, spectrum_fw=spectrum_fw)
-    # transfer_mgf(valid_mgf_file, output_valid_feature_file, spectrum_fw=spectrum_fw)
-    # transfer_mgf(test_mgf_file, output_test_feature_file, spectrum_fw=spectrum_fw)
-    transfer_mgf(denovo_mgf_file, denovo_output_feature_file, denovo_spectrum_fw)
+    folder_name = opt.folder_name
+    denovo_file = opt.denovo_file
+    denovo_mgf_file = folder_name + "/" + "spectrum.mgf"
+    denovo_output_feature_file = folder_name + "/" + "feature.test.csv"
+    denovo_spectrum_fw = open(denovo_mgf_file, "w")
+    transfer_mgf(denovo_file, denovo_output_feature_file, denovo_spectrum_fw)
     denovo_spectrum_fw.close()

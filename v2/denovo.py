@@ -355,15 +355,15 @@ class DeepNovoAttionDenovo():
         total_batch_num = int(len(beam_search_reader.dataset) / deepnovo_config.batch_size_predict)
         for index, batch_denovo_data in enumerate(beam_search_reader):
             logger.info("Read {}th/{} batches".format(index, total_batch_num))
-            if deepnovo_config.is_sb:
-                predicted_batch = self._sb_search_denovo_batch(batch_denovo_data, model_wrapper)
-                predicted_denovo_list += predicted_batch
-                for denovo_result in predicted_batch:
-                    denovo_writer.write(denovo_result.dia_feature, denovo_result.best_beam_search_sequence)
-            else:
-                predicted_forward_batch, predicted_backward_batch = self._search_denovo_batch(batch_denovo_data, model_wrapper)
-                for denovo_forward_result, denvo_backward_result in zip(predicted_forward_batch, predicted_backward_batch):
-                    denovo_writer.write_sequences(denovo_forward_result.dia_feature, denovo_forward_result.best_beam_search_sequence, denvo_backward_result.best_beam_search_sequence)
+            
+            predicted_batch = self._sb_search_denovo_batch(batch_denovo_data, model_wrapper)
+            predicted_denovo_list += predicted_batch
+            for denovo_result in predicted_batch:
+                denovo_writer.write(denovo_result.dia_feature, denovo_result.best_beam_search_sequence)
+            # else:
+            #     predicted_forward_batch, predicted_backward_batch = self._search_denovo_batch(batch_denovo_data, model_wrapper)
+            #     for denovo_forward_result, denvo_backward_result in zip(predicted_forward_batch, predicted_backward_batch):
+            #         denovo_writer.write_sequences(denovo_forward_result.dia_feature, denovo_forward_result.best_beam_search_sequence, denvo_backward_result.best_beam_search_sequence)
                 # predicted_batch = self._sb_search_denovo_batch(batch_denovo_data, model_wrapper)
                 # predicted_denovo_list += predicted_batch
                 # for denovo_result in predicted_batch:
@@ -580,8 +580,14 @@ class DeepNovoAttionDenovo():
         batch_decoder_inputs_backward = batch_decoder_inputs_backward.permute(1, 0)
 
         spectrum_cnn_outputs = model_wrapper.spectrum_cnn(spectrum_holder).permute(1, 0, 2)  # (batchsize, 1, 256)
-        output_logits_forward = model_wrapper.forward_model(spectrum_cnn_outputs, batch_intensity_inputs_forward, batch_decoder_inputs_forward[: -1])
-        output_logits_backward = model_wrapper.backward_model(spectrum_cnn_outputs, batch_intensity_inputs_backward, batch_decoder_inputs_backward[: -1])
+        output_logits_forward, output_logits_backward = model_wrapper.sbatt_model(spectrum_cnn_outputs, 
+                                                                                    batch_intensity_inputs_forward, 
+                                                                                    batch_intensity_inputs_backward,
+                                                                                    batch_decoder_inputs_forward[:-1],
+                                                                                        batch_decoder_inputs_backward[:-1])
+       
+        # output_logits_forward = model_wrapper.forward_model(spectrum_cnn_outputs, batch_intensity_inputs_forward, batch_decoder_inputs_forward[: -1])
+        # output_logits_backward = model_wrapper.backward_model(spectrum_cnn_outputs, batch_intensity_inputs_backward, batch_decoder_inputs_backward[: -1])
         output_logits_forward = output_logits_forward.view(-1, output_logits_forward.size(-1))
         output_logits_backward = output_logits_backward.view(-1, output_logits_backward.size(-1))
        
@@ -889,7 +895,7 @@ class DeepNovoAttionDenovo():
                 
             current_log_prob_forward, current_log_prob_backward = model_wrapper.inference(
                 block_spectrum_cnn_outputs_l2r,
-                block_intensity_input_l2r,
+                block_intensity_input_l2r, # (batch_size, 26, 8, 10)
                 block_intensity_input_r2l,
                 block_decoder_inputs_l2r,
                 block_decoder_inputs_r2l

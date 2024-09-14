@@ -250,6 +250,7 @@ denovo_input_dir = os.environ.get("DENOVO_INPUT_DIR", "/root/biatnovo/dda-train-
 input_feature_file_train = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/features.train.csv"
 input_spectrum_file_train = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/spectrum.mgf"
 input_feature_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/features.valid.csv"
+# input_feature_file_valid = "/root/biatNovo-DDA/mock_feature.csv"
 input_spectrum_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/spectrum.mgf"
 extra_predicted_training_sequence_file = "/root/v2/sb_transformer_independent_multheadapi_finetune_tanh/train_dataset_100.deepnovo_denovo"
 denovo_input_feature_file = os.path.join(denovo_input_dir, "features.train.csv")
@@ -293,16 +294,16 @@ lr_mul = 0.5  # 0.5
 d_model = 256  # 256
 d_inner = 256
 n_warmup_steps = 500
-num_epoch = 15
-steps_per_validation = 100
+num_epoch = 30
+steps_per_validation = 1000
 early_stop = 49 + 10
 
 # ==============================================================================
 # transform parameters
 # ==============================================================================
-is_sb = True  # whether to synchronous bidirectiona
+is_sb = False  # whether to synchronous bidirectiona
 with_extra_predicted_training_sequence = False
-concat_more = False
+concat_more = True
 n_layers = 6
 n_head = 8
 num_units = 256  # use for spectrum_cnn

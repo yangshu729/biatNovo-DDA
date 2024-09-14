@@ -8,7 +8,7 @@ export CUDA_VISIBLE_DEVICES=3
 
 # Define the Python script and its arguments
 PYTHON_SCRIPT="v2/main.py"
-ARGS="--train --train_dir /root/v2/dda_sb_transformer_independent/"
+ARGS="--train --train_dir /root/v2/dda_sb_transformer_independent_shuffle/"
 
 # Function to run the Python script
 run_script() {

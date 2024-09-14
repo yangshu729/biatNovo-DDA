@@ -257,11 +257,11 @@ denovo_input_feature_file = os.path.join(denovo_input_dir, "features.csv")
 denovo_input_spectrum_file = os.path.join(denovo_input_dir, "spectrum.mgf")
 
 denovo_output_dir = os.environ.get("DENOVO_OUTPUT_DIR", "/root/v2/predict")
+denovo_output_file = os.path.join("DENOVO_OUTPUT_FILE", denovo_input_feature_file.split('/')[-1]+ str(calendar.timegm(time.gmtime())) + ".deepnovo_denovo")
 # pre-built knapsack matrix
 knapsack_file = "knapsack.npy"
 
-denovo_output_file = denovo_output_dir + '/' + denovo_input_feature_file.split('/')[-1] \
-+ str(calendar.timegm(time.gmtime())) + ".deepnovo_denovo"
+denovo_output_file = os.path.join(denovo_output_dir, denovo_output_file)
 
 # ==============================================================================
 # feature file column format

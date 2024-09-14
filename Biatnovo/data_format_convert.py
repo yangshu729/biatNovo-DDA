@@ -25,6 +25,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
             header = ["spec_group_id", "m/z", "z", "rt_mean", "seq", "scans", "profile", "feature area"]
             writer.writerow(header)
             flag = False
+            write_header = False
             for line in fr:
                 seq = ""
                 if "BEGIN IONS" in line:
@@ -49,20 +50,6 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                 elif line.startswith("SEQ="):
                     seq = re.split("=|\r|\n", line)[1]
                 elif line.startswith("END IONS"):
-                    # Write updated fields in the correct order
-                    new_title = f"TITLE={base_path}_SCANS_{scan}\n"
-                    new_pepmass = f"PEPMASS={mz}\n"
-                    new_charge = f"CHARGE={z}\n"
-                    new_scans = f"SCANS={scan}\n"
-                    new_rt = f"RTINSECONDS={rt_mean}\n"
-
-                    # Ensure the fields are written in the required order
-                    spectrum_fw.write(new_title)
-                    spectrum_fw.write(new_pepmass)
-                    spectrum_fw.write(new_charge)
-                    spectrum_fw.write(new_scans)
-                    spectrum_fw.write(new_rt)
-
                     # Write the feature to the CSV
                     feature = Feature(spec_id=scan, mz=mz, z=z, rt_mean=rt_mean, seq=seq, scan=scan)
                     writer.writerow(feature.to_list())
@@ -76,6 +63,21 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                     del seq
                     spectrum_fw.write(line)
                 else:
+                    if not write_header:
+                        # Write updated fields in the correct order
+                        new_title = f"TITLE={base_path}_SCANS_{scan}\n"
+                        new_pepmass = f"PEPMASS={mz}\n"
+                        new_charge = f"CHARGE={z}\n"
+                        new_scans = f"SCANS={scan}\n"
+                        new_rt = f"RTINSECONDS={rt_mean}\n"
+
+                        # Ensure the fields are written in the required order
+                        spectrum_fw.write(new_title)
+                        spectrum_fw.write(new_pepmass)
+                        spectrum_fw.write(new_charge)
+                        spectrum_fw.write(new_scans)
+                        spectrum_fw.write(new_rt)
+                        write_header = True
                     spectrum_fw.write(line)
 
 

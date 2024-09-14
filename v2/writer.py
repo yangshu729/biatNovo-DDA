@@ -16,7 +16,7 @@ class BeamSearchedSequence:
 class DenovoWriter(object):
     def __init__(self, denovo_output_file):
         self.log_file = denovo_output_file
-        
+
         header_list = ["feature_id",
                     "feature_area",
                     "predicted_sequence",
@@ -28,7 +28,7 @@ class DenovoWriter(object):
                     "scan_list_middle",
                     "scan_list_original",
                     "predicted_score_max"]
-      
+
         header_row = "\t".join(header_list)
         with open(self.log_file, 'a') as self.output_handle:
             print(header_row, file=self.output_handle, end='\n')

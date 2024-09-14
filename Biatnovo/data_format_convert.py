@@ -26,6 +26,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None):
             writer.writerow(header)
             flag = False
             for line in fr:
+                seq = ""
                 if "BEGIN ION" in line:
                     flag = True
                     spectrum_fw.write(line)
@@ -33,6 +34,10 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None):
                     spectrum_fw.write(line)
                 elif line.startswith("TITLE="):
                     spectrum_fw.write(line)
+                    segments = line.split(".")
+                    # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
+                    if len(segments) >= 4:
+                        scan = segments[-2]
                 elif line.startswith("PEPMASS="):
                     mz = re.split("=|\r|\n", line)[1]
                     spectrum_fw.write(line)

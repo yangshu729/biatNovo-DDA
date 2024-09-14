@@ -253,7 +253,7 @@ input_feature_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_
 # input_feature_file_valid = "/root/biatNovo-DDA/mock_feature.csv"
 input_spectrum_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/spectrum.mgf"
 extra_predicted_training_sequence_file = "/root/v2/sb_transformer_independent_multheadapi_finetune_tanh/train_dataset_100.deepnovo_denovo"
-denovo_input_feature_file = os.path.join(denovo_input_dir, "features.train.csv")
+denovo_input_feature_file = os.path.join(denovo_input_dir, "features.csv")
 denovo_input_spectrum_file = os.path.join(denovo_input_dir, "spectrum.mgf")
 
 denovo_output_dir = os.environ.get("DENOVO_OUTPUT_DIR", "/root/v2/predict")

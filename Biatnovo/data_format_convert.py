@@ -78,7 +78,7 @@ if __name__ == "__main__":
     folder_name = opt.folder_name
     denovo_file = opt.denovo_file
     denovo_mgf_file = folder_name + "/" + "spectrum.mgf"
-    denovo_output_feature_file = folder_name + "/" + "feature.test.csv"
+    denovo_output_feature_file = folder_name + "/" + "features.csv"
     denovo_spectrum_fw = open(denovo_mgf_file, "w")
     transfer_mgf(denovo_file, denovo_output_feature_file, denovo_spectrum_fw)
     denovo_spectrum_fw.close()

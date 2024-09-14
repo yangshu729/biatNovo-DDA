@@ -116,13 +116,15 @@ class DeepNovoTrainDataset(Dataset):
                     self.spectrum_rtinseconds_dict,
                     self.spectrum_count,
                 ) = data
-                    
+
         else:
             # 读取mgf文件是自己写的按照行读取
             print("WorkerIO: build spectrum location from scratch")
             spectrum_location_dict = {}
             spectrum_rtinseconds_dict = {}
             line = True
+            if self.input_spectrum_handle is None:
+                self.input_spectrum_handle = open(self.spectrum_filename, 'r')
             while line:
                 current_location = self.input_spectrum_handle.tell()
                 line = self.input_spectrum_handle.readline()
@@ -139,7 +141,7 @@ class DeepNovoTrainDataset(Dataset):
             self.spectrum_location_dict = spectrum_location_dict
             self.spectrum_rtinseconds_dict = spectrum_rtinseconds_dict
             self.spectrum_count = len(spectrum_location_dict)
-            
+
             with open(spectrum_location_file, "wb") as fw:
                 pickle.dump(
                     (
@@ -149,6 +151,8 @@ class DeepNovoTrainDataset(Dataset):
                     ),
                     fw,
                 )
+            self.input_spectrum_handle.close()
+            self.input_spectrum_handle = None
         # read feature file
         skipped_by_mass = 0
         skipped_by_ptm = 0
@@ -202,7 +206,7 @@ class DeepNovoTrainDataset(Dataset):
                     feature_id = row['feature_id']
                     predicted_forward_sequence = row['predicted_forward_sequence']
                     predicted_backward_sequence = row['predicted_backward_sequence']
-                    
+
                     # 将feature_id作为key，predicted_forward_sequence和predicted_backward_sequence作为值存入字典
                     self.extra_denovo_dict[feature_id] = (predicted_forward_sequence, predicted_backward_sequence)
 
@@ -239,7 +243,7 @@ class DeepNovoTrainDataset(Dataset):
         peptide_ids = [deepnovo_config.vocab[x] for x in feature.peptide]
         peptide_ids_forward = peptide_ids[:]
         peptide_ids_backward = peptide_ids[::-1]
-        
+
         if deepnovo_config.with_extra_predicted_training_sequence:
             if feature.feature_id in self.extra_denovo_dict:
                 predicted_forward_sequence, predicted_backward_sequence = self.extra_denovo_dict[feature.feature_id]
@@ -438,7 +442,7 @@ class DeepNovoTrainDataset(Dataset):
             line = input_file_handle.readline()
 
         return mz_list, intensity_list
-    
+
 
 def collate_func(train_data_list: list[TrainData]):
     """
@@ -446,7 +450,7 @@ def collate_func(train_data_list: list[TrainData]):
     :param train_data_list: list of TrainData
     :return:
     """
-    
+
     #train_data_list.sort(key=lambda x: len(x.peptide_ids_forward), reverse=True)
     # batch_max_seq_len = len(train_data_list[0].peptide_ids_forward)
     batch_max_seq_len = max([len(x.peptide_ids_forward) for x in train_data_list])
@@ -481,7 +485,7 @@ def collate_func(train_data_list: list[TrainData]):
 
     batch_forward_intensity = torch.from_numpy(np.stack(batch_forward_intensity))  # [batch_size, batch_max_seq_len, 26, 8, 10]
     batch_peptide_ids_forward = torch.from_numpy(np.stack(batch_peptide_ids_forward))  # [batch_size, batch_max_seq_len]
-    
+
     batch_backward_intensity = []
     batch_peptide_ids_backward = []
     batch_peptide_ids_predicted_forward = []
@@ -510,7 +514,7 @@ def collate_func(train_data_list: list[TrainData]):
     batch_backward_intensity = torch.from_numpy(
         np.stack(batch_backward_intensity))  # [batch_size, batch_max_seq_len, 26, 8, 10]
     batch_peptide_ids_backward = torch.from_numpy(np.stack(batch_peptide_ids_backward))  # [batch_size, batch_max_seq_len]
-    
+
     if deepnovo_config.with_extra_predicted_training_sequence:
         return (spectrum_holder,
                 batch_forward_intensity,

@@ -3,6 +3,7 @@ import csv
 import re
 from dataclasses import dataclass
 import argparse
+import os
 
 
 @dataclass
@@ -40,8 +41,8 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                     segments = line[6:].split(".")
                     # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
                     if len(segments) >= 4:
-                        scan = segments[-2]
                         run_id = segments[0]
+                        scan = f"{run_id}:{segments[-2]}"
                 elif line.startswith("PEPMASS="):
                     mz = re.split("=|\r|\n", line)[1].split()[0]
                 elif line.startswith("CHARGE="):

@@ -26,17 +26,18 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
             writer.writerow(header)
             flag = False
             write_header = False
+            run_id = ""
             for line in fr:
                 seq = ""
-                run_id = ""
                 if "BEGIN IONS" in line:
                     flag = True
+                    write_header = False
                     spectrum_fw.write(line)
                 elif not flag:
                     spectrum_fw.write(line)
                 elif line.startswith("TITLE="):
                     # Extract scan number from the title
-                    segments = line.split(".")
+                    segments = line[6:].split(".")
                     # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
                     if len(segments) >= 4:
                         scan = segments[-2]

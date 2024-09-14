@@ -167,7 +167,7 @@ def train():
     logger.info(f"{steps_per_epoch} steps per epoch")
     train_data_loader = torch.utils.data.DataLoader(dataset=train_set,
                                                     batch_size=deepnovo_config.batch_size,
-                                                    shuffle=False,
+                                                    shuffle=True,
                                                     num_workers=deepnovo_config.num_workers,
                                                     collate_fn=collate_func)
     valid_set = DeepNovoTrainDataset(deepnovo_config.input_feature_file_valid,
@@ -272,10 +272,8 @@ def train():
             output_logits_backward_trans = output_logits_backward.reshape(-1, output_logits_backward.size(2))
             output_logits_forward = output_logits_forward.transpose(0, 1)
             output_logits_backward = output_logits_backward.transpose(0, 1) # (seq_len, batchsize, 26)
-            logger.info(f"step:{i}, output_logits_forward:{output_logits_forward.mean()}")
             loss = cal_dia_focal_loss(output_logits_forward_trans, output_logits_backward_trans, gold_forward, gold_backward, batchsize)
             loss.backward()
-            logger.info(f"step:{i}, loss: {loss.item()}")
             
             new_loss += loss.item() / deepnovo_config.steps_per_validation
             optimizer.step_and_update_lr()
@@ -336,7 +334,7 @@ def train():
                         logger.info(f"best valid loss achieved at epoch {epoch} step {i}")
                         best_epoch = epoch
                         best_step = i
-                    save_model(spectrum_cnn, optimizer, None, None, sbatt_model, epoch=epoch)
+                    # save_model(spectrum_cnn, optimizer, None, None, sbatt_model, epoch=epoch)
                     # else:
                     #     save_model(spectrum_cnn, optimizer, forward_deepnovo, backward_deepnovo, None)
                 else:
@@ -350,7 +348,7 @@ def train():
                 sbatt_model.train()
                
         logger.info(f"epoch {epoch} finished")
-        # save_model(spectrum_cnn, optimizer, None, None, sbatt_model, epoch=epoch)
+        save_model(spectrum_cnn, optimizer, None, None, sbatt_model, epoch=epoch)
         # if no_update_count >= deepnovo_config.early_stop:
         #     break
 

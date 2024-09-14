@@ -18,7 +18,7 @@ class Feature:
         return [self.spec_id, self.mz, self.z, self.rt_mean, self.seq, self.scan, "0.0:1.0", "1.0"]
 
 
-def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None):
+def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, base_path=None):
     with open(old_mgf_file_name, "r") as fr:
         with open(output_feature_file_name, "w") as fw:
             writer = csv.writer(fw, delimiter=",")
@@ -27,34 +27,47 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None):
             flag = False
             for line in fr:
                 seq = ""
-                if "BEGIN ION" in line:
+                if "BEGIN IONS" in line:
                     flag = True
                     spectrum_fw.write(line)
                 elif not flag:
                     spectrum_fw.write(line)
                 elif line.startswith("TITLE="):
-                    spectrum_fw.write(line)
+                    # Extract scan number from the title
                     segments = line.split(".")
                     # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
                     if len(segments) >= 4:
                         scan = segments[-2]
                 elif line.startswith("PEPMASS="):
                     mz = re.split("=|\r|\n", line)[1]
-                    spectrum_fw.write(line)
                 elif line.startswith("CHARGE="):
                     z = re.split("=|\r|\n|\+", line)[1]
-                    spectrum_fw.write("CHARGE=" + z + "\n")
                 elif line.startswith("SCANS="):
                     scan = re.split("=|\r|\n", line)[1]
-                    spectrum_fw.write(line)
                 elif line.startswith("RTINSECONDS="):
                     rt_mean = re.split("=|\r|\n", line)[1]
-                    spectrum_fw.write(line)
                 elif line.startswith("SEQ="):
                     seq = re.split("=|\r|\n", line)[1]
                 elif line.startswith("END IONS"):
+                    # Write updated fields in the correct order
+                    new_title = f"TITLE={base_path}_SCANS_{scan}\n"
+                    new_pepmass = f"PEPMASS={mz}\n"
+                    new_charge = f"CHARGE={z}\n"
+                    new_scans = f"SCANS={scan}\n"
+                    new_rt = f"RTINSECONDS={rt_mean}\n"
+
+                    # Ensure the fields are written in the required order
+                    spectrum_fw.write(new_title)
+                    spectrum_fw.write(new_pepmass)
+                    spectrum_fw.write(new_charge)
+                    spectrum_fw.write(new_scans)
+                    spectrum_fw.write(new_rt)
+
+                    # Write the feature to the CSV
                     feature = Feature(spec_id=scan, mz=mz, z=z, rt_mean=rt_mean, seq=seq, scan=scan)
                     writer.writerow(feature.to_list())
+
+                    # Reset flags and clean up variables
                     flag = False
                     del scan
                     del mz

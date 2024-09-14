@@ -5,11 +5,11 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 import logging
 
 import numpy as np
 import calendar
+import os
 
 import time
 # ==============================================================================
@@ -243,6 +243,8 @@ topk_output = 1
 # INPUT/OUTPUT FILES
 # ==============================================================================
 
+# get path from environment variable
+denovo_input_dir = os.environ.get("DENOVO_INPUT_DIR", "/root/biatnovo/dda-train-data/nine_sepcies_training_data/")
 # input_feature_file_train = "/root/v2/sb_transformer_independent_multheadapi_finetune_tanh/filter_train_dataset_100.csv"
 # input_spectrum_file_train = "/root/biatnovo/DeepNovo-DIA/oc/oc_test.spectrum.mgf"
 input_feature_file_train = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/features.train.csv"
@@ -250,10 +252,10 @@ input_spectrum_file_train = "/root/biatnovo/dda-train-data/nine_sepcies_training
 input_feature_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/features.valid.csv"
 input_spectrum_file_valid = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/spectrum.mgf"
 extra_predicted_training_sequence_file = "/root/v2/sb_transformer_independent_multheadapi_finetune_tanh/train_dataset_100.deepnovo_denovo"
-denovo_input_feature_file = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/features.test.csv"
-denovo_input_spectrum_file = "/root/biatnovo/dda-train-data/nine_sepcies_training_data/spectrum.mgf"
+denovo_input_feature_file = os.path.join(denovo_input_dir, "features.train.csv")
+denovo_input_spectrum_file = os.path.join(denovo_input_dir, "spectrum.mgf")
 
-denovo_output_dir = "/root/v2/predict"
+denovo_output_dir = os.environ.get("DENOVO_OUTPUT_DIR", "/root/v2/predict")
 # pre-built knapsack matrix
 knapsack_file = "knapsack.npy"
 
@@ -306,4 +308,3 @@ n_head = 8
 num_units = 256  # use for spectrum_cnn
 lstm_layers = 2
 print(n_layers)
-print("aaaaaa")

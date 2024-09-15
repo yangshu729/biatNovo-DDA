@@ -19,7 +19,7 @@ class Feature:
         return [self.spec_id, self.mz, self.z, self.rt_mean, self.seq, self.scan, "0.0:1.0", "1.0"]
 
 
-def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, base_path=None):
+def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None):
     with open(old_mgf_file_name, "r") as fr:
         with open(output_feature_file_name, "w") as fw:
             writer = csv.writer(fw, delimiter=",")
@@ -27,7 +27,6 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
             writer.writerow(header)
             flag = False
             write_header = False
-            run_id = ""
             for line in fr:
                 seq = ""
                 if "BEGIN IONS" in line:
@@ -37,12 +36,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                 elif not flag:
                     spectrum_fw.write(line)
                 elif line.startswith("TITLE="):
-                    # Extract scan number from the title
-                    segments = line[6:].split(".")
-                    # the title format is <RunId>.<ScanNumber>.<ScanNumber>.<ChargeState>
-                    if len(segments) >= 4:
-                        run_id = segments[0]
-                        scan = f"{run_id}:{segments[-2]}"
+                    title = re.split("=|\r|\n", line)[1]
                 elif line.startswith("PEPMASS="):
                     mz = re.split("=|\r|\n", line)[1].split()[0]
                 elif line.startswith("CHARGE="):
@@ -69,7 +63,7 @@ def transfer_mgf(old_mgf_file_name, output_feature_file_name, spectrum_fw=None, 
                 else:
                     if not write_header:
                         # Write updated fields in the correct order
-                        new_title = f"TITLE={base_path}_SCANS_{scan}\n" if base_path else f"TITLE={run_id}_SCANS_{scan}\n"
+                        new_title = f"TITLE={title}\n"
                         new_pepmass = f"PEPMASS={mz}\n"
                         new_charge = f"CHARGE={z}\n"
                         new_scans = f"SCANS={scan}\n"

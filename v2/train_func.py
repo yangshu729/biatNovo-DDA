@@ -11,7 +11,7 @@ from v2 import deepnovo_config
 import logging
 
 from v2.model import DeepNovoAttion, SpectrumCNN2
-from v2.test_accuracy import cal_sb_dia_focal_loss, test_logit_batch_2
+from v2.test_accuracy import test_logit_batch_2
 torch.autograd.set_detect_anomaly(True)
 
 

@@ -28,7 +28,7 @@ Unzip the `knapsack.npy.zip`, and put the uncompressed data into the root folder
 #### Start inference
 
 The `DENOVO_INPUT_DIR` should contain the mgf file and feature file. The name must be `features.csv` and `spectrum.mgf`
-User container donwload the checkpoint from our release page
+User can donwload the checkpoint from our release page
 Run command:
 ```bash
 export DENOVO_INPUT_DIR=input_data
